@@ -1,4 +1,7 @@
 import java.util.Date
+
+import sbt.Credentials
+import sbt.Keys.credentials
 import sbtprotobuf.ProtobufPlugin
 
 val akkaVersion = "2.4.17"
@@ -25,8 +28,7 @@ lazy val commonSettings = Seq(
     ("com.typesafe", "config") → "http://typesafehub.github.io/config/latest/api"
   )
 )
-publishTo := Some("Artifactory Realm" at "http://artifactory.navy.elama.ru:8081/artifactory/libs-release-local")
-credentials += Credentials("Artifactory Realm", "artifactory.navy.elama.ru", "admin", "APwvYGBWnHuKC71xHkdbfsVYRCPNZMiGRhpnG")
+
 
 val bintrayPublishing = Seq(
 
@@ -37,12 +39,7 @@ val bintrayPublishing = Seq(
     if (isSnapshot.value) Some("OJO Snapshots" at s"https://oss.jfrog.org/artifactory/oss-snapshot-local;build.timestamp=${new Date().getTime}")
     else publishTo.value
   },
-  credentials ++= {
-    List(bintrayCredentialsFile.value)
-      .filter(_.exists())
-      .map(f ⇒ Credentials.toDirect(Credentials(f)))
-      .map(c ⇒ Credentials("Artifactory Realm", "oss.jfrog.org", c.userName, c.passwd))
-  },
+  publishTo := Some("Artifactory Realm" at "http://artifactory.navy.elama.ru:8081/artifactory/libs-release-local"),
   bintrayReleaseOnPublish := {
     if (isSnapshot.value) false
     else bintrayReleaseOnPublish.value
