@@ -1,5 +1,3 @@
-import java.util.Date
-
 import sbt.Credentials
 import sbt.Keys.credentials
 import sbtprotobuf.ProtobufPlugin
@@ -36,10 +34,13 @@ val bintrayPublishing = Seq(
   bintrayPackageLabels := Seq("kamon", "prometheus", "metrics"),
   bintrayVcsUrl := Some("https://github.com/MonsantoCo/kamon-prometheus"),
   publishTo := {
-    if (isSnapshot.value) Some("OJO Snapshots" at s"https://oss.jfrog.org/artifactory/oss-snapshot-local;build.timestamp=${new Date().getTime}")
-    else publishTo.value
+    if (isSnapshot.value) {
+      Some("Artifactory Realm" at "http://artifactory.navy.elama.ru:8081/artifactory/libs-snapshot-local")
+    } else {
+      Some("Artifactory Realm" at "http://artifactory.navy.elama.ru:8081/artifactory/libs-release-local")
+    }
   },
-  publishTo := Some("Artifactory Realm" at "http://artifactory.navy.elama.ru:8081/artifactory/libs-release-local"),
+  credentials += Credentials(Path.userHome / ".sbt" / ".credentials"),
   bintrayReleaseOnPublish := {
     if (isSnapshot.value) false
     else bintrayReleaseOnPublish.value
@@ -68,25 +69,25 @@ lazy val library = (project in file("library"))
     name := "kamon-prometheus",
     description := "Kamon module to export metrics to Prometheus",
     libraryDependencies ++= Seq(
-      "io.kamon"               %% "kamon-core"               % kamonVersion,
-      "com.typesafe.akka"      %% "akka-actor"               % akkaVersion,
-      "com.typesafe.akka"      %% "akka-http"                % akkaHttpVersion  % "provided",
-      "com.typesafe"            % "config"                   % "1.3.1",
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5"          % "provided",
+      "io.kamon" %% "kamon-core" % kamonVersion,
+      "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+      "com.typesafe.akka" %% "akka-http" % akkaHttpVersion % "provided",
+      "com.typesafe" % "config" % "1.3.1",
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5" % "provided",
       // -- testing --
-      "ch.qos.logback"     % "logback-classic"   % "1.1.7"          % testConfigs,
-      "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion  % "test",
-      "com.typesafe.akka" %% "akka-slf4j"        % akkaVersion      % testConfigs,
-      "com.typesafe.akka" %% "akka-testkit"      % akkaVersion      % "test",
-      "org.scalatest"     %% "scalatest"         % "3.0.1"          % testConfigs,
-      "io.kamon"          %% "kamon-akka-2.4"    % kamonVersion     % "test",
-      "org.scalacheck"    %% "scalacheck"        % "1.13.4"         % "test"
+      "ch.qos.logback" % "logback-classic" % "1.1.7" % testConfigs,
+      "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % "test",
+      "com.typesafe.akka" %% "akka-slf4j" % akkaVersion % testConfigs,
+      "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
+      "org.scalatest" %% "scalatest" % "3.0.1" % testConfigs,
+      "io.kamon" %% "kamon-akka-2.4" % kamonVersion % "test",
+      "org.scalacheck" %% "scalacheck" % "1.13.4" % "test"
     ),
     dependencyOverrides ++= Set(
-      "com.typesafe.akka"      %% "akka-actor"    % akkaVersion,
-      "org.scala-lang"          % "scala-library" % scalaVersion.value,
-      "org.scala-lang"          % "scala-reflect" % scalaVersion.value,
-      "org.scala-lang.modules" %% "scala-xml"     % "1.0.6"
+      "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+      "org.scala-lang" % "scala-library" % scalaVersion.value,
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
     ),
     version in ProtobufPlugin.protobufConfig := "2.6.1",
 
@@ -113,6 +114,6 @@ lazy val `kamon-prometheus` = (project in file("."))
     site.settings,
     site.asciidoctorSupport(),
     site.includeScaladoc("api/snapshot"),
-    UnidocKeys.unidocProjectFilter in (ScalaUnidoc, UnidocKeys.unidoc) := inAnyProject,
-    site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api/snapshot")
+    UnidocKeys.unidocProjectFilter in(ScalaUnidoc, UnidocKeys.unidoc) := inAnyProject,
+    site.addMappingsToSiteDir(mappings in(ScalaUnidoc, packageDoc), "api/snapshot")
   )
