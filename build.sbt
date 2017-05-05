@@ -66,7 +66,7 @@ lazy val library = (project in file("library"))
     ProtobufPlugin.protobufSettings,
     inConfig(BufferedConfigTest)(Defaults.testSettings),
     inConfig(InvalidConfigTest)(Defaults.testSettings),
-    name := "kamon-prometheus",
+    name := "kamon-prometheus-elama-fork",
     description := "Kamon module to export metrics to Prometheus",
     libraryDependencies ++= Seq(
       "io.kamon" %% "kamon-core" % kamonVersion,
